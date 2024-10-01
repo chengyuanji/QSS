@@ -1,0 +1,697 @@
+---
+title: "上海交通大学《数据科学导论》季程远：R语言基础"
+tutorial:
+  id: "01-r-basics"
+output:
+  learnr::tutorial:
+    progressive: true
+    ace_theme: github
+    css: "css/tutorial.css"
+runtime: shiny_prerendered
+description: "This tutorial will introduce you to the basics of R"
+---
+
+<!-- Add JavaScript code for making the exercise code larger -->
+
+```{=html}
+<script language="JavaScript" src="js/exercise-font-size.js"></script>
+```
+```{r setup, include=FALSE}
+library(gradethis)
+library(learnr)
+library(qsslearnr)
+library(gapminder)
+library(tidyverse)
+tutorial_options(exercise.checker = gradethis::grade_learnr)
+knitr::opts_chunk$set(echo = FALSE)
+tut_reptitle <- "Output Report"
+gapminder <- filter(gapminder, year == 2007)
+```
+
+## Basics of R
+
+### R as a calculator
+
+First, we'll learn how to use R as a calculator.
+
+-   Use the `+` sign to add 5 and 3
+
+```{r add, exercise=TRUE}
+
+```
+
+```{r add-check}
+grade_result(
+  pass_if(~ identical(.result, 8))
+)
+```
+
+-   Use the `-` sign to subtract 3 from 5
+
+```{r subtract, exercise=TRUE, exercise.lines = 5}
+
+```
+
+```{r subtract-check}
+grade_result(
+  pass_if(~ identical(.result, 2))
+)
+```
+
+-   Use the `/` to divide 6 by 2
+
+```{r divide, exercise=TRUE}
+
+```
+
+```{r divide-check}
+grade_result(
+  pass_if(~ identical(.result, 6 / 2))
+)
+```
+
+-   Use the `sqrt()` function to take the square root of 16
+
+```{r sqrt, exercise=TRUE}
+
+```
+
+```{r sqrt-check}
+grade_result(
+  pass_if(~ identical(.result, sqrt(16)), "Now you know how to use R as a calculator.")
+)
+```
+
+### Storing results
+
+Everything in R is an object and your code will create and modify these objects. It will often be useful to save the output of a command or function as an object with a particular name to be able to quickly refer to it later in your code without having to recreate it. We say that we **assign** the output to the new object. Names of objects are case sensitive (so `My_Data` won't find an object assigned to `my_data`) and some names are not permitted (`TRUE`, `FALSE`, `NA`, and some others). While permitted, it's not good to name objects with commonly used functions like `c()` or `mean()`. We assign output to objects using the assignment operator `<-` (the less than sign `<` and then the minus sign `-` with no space between).
+
+Let's start by creating a vector object using the `c()` function to concatenate (or combine) a sequence of numbers separated by commas:
+
+```{r cfun}
+c(4, 8, 15, 16, 23, 42)
+```
+
+Just running that command alone simply prints the object to the console and does not save or assign it anywhere.
+
+-   Replace `...` with the above vector object to assign it to the name `my_numbers`.
+-   Print the value of `my_numbers` to the console by typing it on its own line.
+
+```{r storing, exercise = TRUE, exercise.lines = 6}
+## assign the vector of numbers here
+my_numbers <- ...
+
+## print the value of my_numbers on the next line
+
+```
+
+```{r storing-check}
+grade_result_strict(
+  pass_if(~ identical(my_numbers, c(4, 8, 15, 16, 23, 42))),
+  pass_if(~ identical(.result, c(4, 8, 15, 16, 23, 42)))
+)
+```
+
+### Using functions
+
+One way we will use R a ton is through functions. Functions are the bread and butter of R. They accept *inputs* called **arguments** and return outputs. The general schematic for functions in R is:
+
+```{r, eval = FALSE}
+function_name(argument1 = <value1>,
+              argument2 = <value2>,
+              argument3 = <value3)
+```
+
+They allow us to act on or get information about vectors and other objects. For instance, the following functions are pretty useful for any vector:
+
+-   `length(x = some_numbers)` calculates the number of elements/entries in the `some_numbers` vector.
+-   `min(some_numbers)` calculates the smallest value in the `some_numbers` vector.
+-   `max(some_numbers)` calculates the largest value in the `some_numbers` vector .
+-   `mean(x = some_numbers)` calculates the average value in the `some_numbers` vector (that is the sum of the entries divided by the number of entries).
+-   `sum(some_numbers)` calculates the sum of the values in the `some_numbers` vector.
+
+Calling some of these functions
+
+-   Calculate the number of elements in the `my_numbers` vector.
+
+```{r mynums}
+my_numbers <- c(4, 8, 15, 16, 23, 42)
+```
+
+```{r length, exercise = TRUE, exercise.setup = "mynums"}
+## calculate the number of entries in my_numbers
+
+```
+
+```{r length-solution}
+length(my_numbers)
+```
+
+```{r length-check}
+grade_this_code()
+```
+
+-   Calculate the minimum value of the vector.
+
+```{r min, exercise = TRUE, exercise.setup = "mynums"}
+## calculate the minimum value of my_numbers
+
+```
+
+```{r min-solution}
+min(my_numbers)
+```
+
+```{r min-check}
+grade_this_code()
+```
+
+-   Calculate the average value of the vector.
+
+```{r mean, exercise = TRUE, exercise.setup = "mynums"}
+## calculate the average value of my_numbers
+
+```
+
+```{r mean-solution}
+mean(my_numbers)
+```
+
+```{r mean-check}
+grade_this_code()
+```
+
+### Characters and strings
+
+A lot of the time we'll work with numbers in R, but we will also want to use a lot of text which are called character strings in R. We will often use these strings to specify colors for plots, to provide labels to plots or to label categorical variables.
+
+Create a vector called `course_topics` that contains two strings: `"data science"` and `"social science"` and print the object to the console. You can use the `c()` function to combine strings in the same way you combined numbers (just make sure each string is contained in quotes).
+
+```{r strings, exercise=TRUE}
+## create the course_topics vector
+
+## print the value of course_topics on the next line
+
+```
+
+```{r strings-check}
+grade_result(
+  pass_if(~ identical(.result, c("data science", "social science")))
+)
+```
+
+### Copying and reassigning variables
+
+When we assign an existing object to a new name we always make a copy of it. This can be useful when you want it, but it also means you can lose what's in your object if you accidentally overwrite it. Here, we are going to learn about creating a copy of an object before overwriting it.
+
+- Assign the value of `result` to `result2`
+- Overwrite the value of `result` with `10 - 2`
+
+```{r copying-setup}
+result <- 8 - 2
+```
+
+```{r copying, exercise=TRUE}
+## First result
+result <- 8 - 2
+
+## Assign the value of "result" to "result2"
+
+
+## Overwrite "result"
+result <- ...
+
+## Print result on next line
+
+```
+
+```{r copying-solution}
+result2 <- result
+```
+
+```{r copying-check}
+grade_result_strict(
+  pass_if(~ identical(result2, 8 - 2)),
+  pass_if(~ identical(.result, 10 - 2)),
+  pass_if(~ identical(result, 10 - 2))
+)
+```
+
+### Checking the class of an object
+
+We've now seen two different types of objects: numbers and strings. The type of object in R is called its *class*. We can check the class of any object using the `class()` function. This can be helpful when you are unsure about what output was saved to an object.
+
+Try checking the class of the `my_numbers` object, the `course_topics` object, and the `mean` function.
+
+```{r class-setup, echo = FALSE}
+my_numbers <- c(4, 8, 15, 16, 23, 42)
+course_topics <- c("data science", "social science")
+```
+
+```{r class-numeric, exercise = TRUE, exercise.setup = "class-setup"}
+
+```
+
+```{r class-numeric-solution}
+class(my_numbers)
+class(course_topics)
+class(mean)
+```
+
+One reason it's useful to use this function is that it can be very easy to accidentally change the class of an object in R. To see this, create a new vector called `new_vec` that concatenates `my_numbers` and the string `"DHARMA"`, print `new_vec`, and then call the `class()` function on the resulting object.
+
+```{r class-change, exercise = TRUE, exercise.setup = "class-setup"}
+
+```
+
+```{r class-change-hint}
+new_vec <- c(my_numbers, <string to be added>)
+```
+
+```{r class-change-solution}
+new_vec <- c(my_numbers, "DHARMA")
+print(new_vec)
+class(new_vec)
+```
+
+```{r class-change-check}
+grade_this_code()
+```
+
+What happened? Adding a string to this numeric vector changed all of the original numbers to strings themselves (notice the quotation marks around the numbers).
+
+## Working with Data
+
+### Working with real data
+
+Next, we are going to start working with real data: estimates of world population (in thousands). A vector of data called `world.pop` has been loaded with this lesson. The first element is for the year 1950 up to the last element for 2010. You can see that we create the vector by using the `c()` function which concatenates multiple values together into one vector. We enter the data one value at a time, each separated by a comma.
+
+- Print the `world.pop` data by simply typing it into a line of code.
+
+```{r printdata, exercise=TRUE}
+## create the world.pop data
+world.pop <- c(2525779, 3026003, 3691173, 4449049, 5320817, 6127700, 6916183)
+
+## print the world.pop data
+
+```
+
+```{r printdata-solution}
+world.pop
+```
+
+### Indexing and subsetting
+
+
+Vectors are just a series of objects in R that are all stored together in a specific order. What if we want to access a specific value in the vector? Well, for that, we can use the indexing and subsetting tools in R. Specifically, we will use the the square brackets, `[ ]` to access specific values within the vector.
+
+
+- Use the brackets to access the fourth entry in the `world.pop` data.
+
+```{r worlddata}
+world.pop <- c(2525779, 3026003, 3691173, 4449049, 5320817, 6127700, 6916183)
+```
+
+```{r indexing1, exercise=TRUE, exercise.setup = "worlddata"}
+## access and print the 4th value of world.pop
+
+```
+
+```{r indexing1-check}
+grade_result(
+  pass_if(~ identical(.result, world.pop[4]))
+)
+```
+
+- Use the brackets to access and print the first and fourth entries of the `world.pop` data. You will need to use the `c()` function to create a vector of indices that you want to access.
+
+
+```{r indexing2, exercise=TRUE, exercise.setup = "worlddata"}
+## access and print the 1st and 4th value of world.pop
+
+```
+
+```{r indexing2-check}
+grade_result(
+  pass_if(~ identical(.result, world.pop[c(1,4)]))
+)
+```
+
+
+### Creating and using sequences
+
+Creating vectors using the `c()` command can be cumbersome and time consuming. Sometimes we can create vectors much more quickly. One place where we can do this is with sequences of numbers that follow a pre-specified pattern. In that case, we can use the `seq()` function. This function most commonly takes three arguments:
+
+- `from` - the first number in the sequence.
+- `to` - the last number in the sequence
+- `by` - the increments between each value in the sequence.
+
+We're going to use this to create a label for the  `world.pop` vector. We can assign these labels using the `names()` function.
+
+
+- Create a vector called `year` that is a sequence from 1950 to 2010 that increases in increments of 10 years and print it.
+- Assign this `year` vector to the `names(world.pop)` to set the names of the `world.pop` vector.
+
+```{r seq, exercise = TRUE, exercise.setup = "worlddata"}
+## create a vector with a sequence from 1950 to 2010 by 10
+year <- ...
+
+names(world.pop) <- ...
+
+world.pop
+```
+
+```{r seq-check}
+grade_result_strict(
+  pass_if(~ identical(year, seq(1950, 2010, by = 10))),
+  pass_if(~ identical(.result, c("1950" = 2525779, "1960" = 3026003, "1970" = 3691173, "1980" = 4449049, "1990" = 5320817, "2000" = 6127700, "2010" = 6916183)))
+)
+```
+
+### Replacing values in a vector
+
+Indexing and subsetting allow you to access specific values in the vector, but you can also use the same syntax to replace certain values in the vector. That is we can assign a value such as `x[4] <- 50`, which would replace the fourth entry in the `x` vector with the number 50.
+
+For example, suppose that your research assistant came running in to tell you that the earliest world population data was actually from 1945, not 1950. Here, you will fix this in your vector.
+
+
+- Replace the first entry of the `year` vector with 1945.
+
+```{r replace, exercise = TRUE}
+year <- seq(from=1950, to=2010, by = 10)
+
+## update the first entry of year
+
+
+## print the modified year vector
+
+```
+
+```{r replace-check}
+grade_result(
+  pass_if(~ identical(year[1], 1945))
+)
+```
+
+
+### Arithmetic with vectors
+
+What if we wanted our data in millions of people? How would we create this vector from the vector that we have? (Recall that world.pop is currently in units of thousands of people.) One way would be to do this manually---create a new vector using `c()` that concatenates the world population in millions of people rather than thousands of people. But this is cumbersome, can't we use the vector we already have? Yes!
+
+We can apply many types of arithmetic operators such as addition, subtraction, multiplication, and division to our vector. For example, the code `x + 5` will add the number 5 to each value in the vector. In this exercise, we will create a new vector that is the world population in millions of people, which is just the total population in thousands divided by 1000.
+
+
+- Divide the `world.pop` vector by 1000 and assign it to a new vector called `pop.million`.
+- Print out the `pop.million` variable.
+
+```{r vector_math, exercise=TRUE, exercise.setup = "worlddata"}
+## create the pop.million variable.
+pop.million <- ...
+
+## print out the pop.million variable
+
+```
+
+```{r vector_math-check}
+grade_result(
+  pass_if(~ identical(pop.million, world.pop / 1000))
+)
+```
+
+
+### Working with a data frame
+
+A data frame is an object in R that is basically like a spreadsheet with some number of rows (units) and some number of columns (variables) and a name for each column. There are a number of ways to interact with a data frame to get useful information about it. For example, if I have a data frame called `mydata`, I can do the following:
+
+-   `names(mydata)` - returns the column (variable) names of the data.
+-   `ncol(mydata)` - returns the number of columns in the data.
+-   `nrow(mydata)` - returns the number of rows of the data.
+-   `dim(mydata)` - returns a vector of the number of rows and the number of columns (the dimension of the data).
+-   `summary(mydata)` - provides a summary of each variable in the data.
+
+These are super useful functions. Let's use some of these on a data frame, `UNpop`, which has estimates of world population (in thousands) in ten year intervals.
+
+
+```{r unpop}
+UNpop <- data.frame(
+  year = seq(1950, 2010, by = 10),
+  world.pop = c(2525779, 3026003, 3691173, 4449049, 5320817, 6127700, 6916183)
+)
+```
+
+-   Print the `UNpop` data frame, you can just type in `UNpop`.
+
+```{r printdf, exercise = TRUE, exercise.setup = "unpop"}
+## Print the UNpop data frame
+
+```
+
+```{r printdf-solution}
+## Print the UNpop data frame
+UNpop
+```
+
+```{r printdf-check}
+grade_this_code()
+```
+
+-   Output the variables names in the `UNpop` data frame.
+
+```{r namesdf, exercise = TRUE, exercise.setup = "unpop"}
+## Print the variable names of UNpop
+
+```
+
+```{r namesdf-solution}
+names(UNpop)
+```
+
+```{r namesdf-check}
+grade_this_code()
+```
+
+-   Use the `dim` function report the number of rows and columns of the data frame (the output shows rows first then columns)
+
+```{r dim, exercise = TRUE, exercise.setup = "unpop"}
+## Print the dimensions of UNpop
+
+```
+
+```{r dim-solution}
+## Print the UNpop data frame
+dim(UNpop)
+```
+
+```{r dim-check}
+grade_this_code()
+```
+
+-   Use the `summary` function to show a summary of each variable.
+
+```{r summary, exercise = TRUE, exercise.setup = "unpop"}
+## Print a summary of the data in UNpop
+
+```
+
+```{r summary-solution}
+summary(UNpop)
+```
+
+```{r summary-check}
+grade_this_code()
+```
+
+### Subsetting a data frame (I)
+
+When our data gets bigger than this example, printing the data to the screen might be an a messy way to explore our data. There are two main ways to explore a data set:
+
+-   The `glimpse()` function from the `dplyr` package (part of tidyverse). This function will show the number of rows and columns, names of each of the variables in the data frame, the data type of each column, and the first few entries.
+
+-   Apply the `glimpse` function to the `UNpop` data frame.
+
+```{r glimpse, exercise = TRUE}
+## Print the variable names of UNpop
+
+```
+
+```{r glimpse-solution}
+glimpse(UNpop)
+```
+
+```{r glimpse-check}
+grade_this_code()
+```
+
+-   You'll often need to access different parts of a data frame to use in other commands. For instance, maybe you want to take the mean of a column of the data frame or maybe you want to see all of the data for the 4th unit. Either way, we'll need to know how to subset the data frame. To select a particular variable from the data frame, you can use the `$` operator. So `mydata$myvar` will be a vector of just the `myvar` column of the `mydata` data frame.
+
+-   Extract the `world.pop` variable from the `UNpop` data frame.
+
+```{r dollar, exercise = TRUE, exercise.setup = "unpop"}
+## Extract the world.pop variable
+
+```
+
+```{r dollar-solution}
+## Extract the world.pop variable
+UNpop$world.pop
+```
+
+```{r dollar-check}
+grade_this_code()
+```
+
+### Subsetting a data frame (II)
+
+You can also use the brackets `[ ]` to subset from the data frame. But how will R know if you want to subset the rows or the columns? With a data frame as opposed to a vector, you will use a comma and the bracket will have the following form: `[rows, columns]` where the expression before the comma will select the rows and the expression after the comma will select the columns.
+
+- `mydata[,"myvar"]` will select the `myvar` column from `mydata`
+- `mydata[1,]` will select the first row of `mydata`
+- `mydata[c(1,2,3),]` will select the first three rows of `mydata`
+- `mydata[1:3, "myvar"]` will select the first three values of the `myvar` variable of `mydata`
+
+
+- Use the bracket commands to extract and print the `world.pop` variable from the `UNpop` data frame.
+
+```{r brackets, exercise = TRUE, exercise.setup = "unpop"}
+## use brackets to print out the world.pop variable
+
+```
+
+```{r brackets-solution}
+UNpop[, "world.pop"]
+```
+
+```{r brackets-check}
+grade_this_code()
+```
+
+
+
+## Working with Data in tidyverse
+
+You'll often need to access different parts of a data frame to use in other commands. For instance, maybe you want to take the mean of a column of the data frame or maybe you want to see all of the data for the 4th unit. Either way, we'll need to know how to subset the data frame. 
+
+
+### Before subsetting...
+
+Before introducing functions for subsetting, we will introduce the pipe operator to you. The pipe, `%>%` , is able to help you code in a much more interpretable way.  It is able to pass the data set to the function that you are interested in using.
+
+```{r}
+UNpop <- data.frame(
+  year = seq(1950, 2010, by = 10),
+  world.pop = c(2525779, 3026003, 3691173, 4449049, 5320817, 6127700, 6916183)
+)
+```
+
+
+- Use the pipe to pass `UNpop` data set to the `summary` function.
+
+```{r pipe, exercise = TRUE, exercise.setup = "unpop"}
+# use the pipe (`%>%`) to pass UNpop to the summary function
+```
+
+```{r pipe-solution}
+UNpop %>%
+  summary()
+```
+
+```{r pipe-check}
+grade_this_code()
+```
+
+### Subsetting a data frame (I)
+
+
+To select a particular variable from the data frame, you can use the `select()` function. So `mydata %>% select(myvar)` will be a vector of just the `myvar` column of the `mydata` data frame. 
+
+
+- Use the `select()` function with the pipe (`%>%`) to print out the `world.pop` variable from the `UNpop` data frame.
+
+```{r select, exercise = TRUE, exercise.setup = "unpop"}
+## print out the world.pop variable using select()
+
+```
+
+```{r select-solution}
+UNpop %>%
+  select(world.pop) 
+```
+
+```{r select-check}
+grade_this_code()
+```
+
+
+
+### Subsetting a data frame (II)
+
+The `slice()` function is an intuitive way to index rows by their locations in a data set. It allows you to work with rows with multiple useful arguments.
+
+
+- Use the `slice()` function to extract and print rows 5 through 7 of the `UNpop` data frame. Please note that even if the `n` argument is unnamed, the code will still be valid and produce the same result. But please write the full argument in this exercise for practice purposes. 
+
+
+```{r rows, exercise = TRUE, exercise.setup = "unpop"}
+## extract rows 5 through 7 and all variables
+
+```
+
+```{r rows-solution}
+UNpop %>%
+  slice(5:7)
+```
+
+```{r rows-check}
+grade_this_code()
+```
+
+
+- Use the `slice()` and `select()` functions to extract and print rows 5 through 7 of the `world.pop` variable of the `UNpop` data frame.
+
+
+```{r rowcols, exercise = TRUE, exercise.setup = "unpop"}
+## extract values 5 through 7 of the world.pop variable
+
+```
+
+```{r rowcols-solution}
+UNpop %>%
+  slice(5:7) %>%
+  select(world.pop)
+```
+
+```{r rowcols-check}
+grade_this_code()
+```
+
+
+### Subsetting a data frame (III)
+
+To select a particular variable that meets specific conditions, you can use the `filter()` function. 
+
+
+- Use the `filter()` function to extract the observations up to and including 1990 of the `UNpop` data frame.
+
+```{r filter, exercise = TRUE, exercise.setup = "unpop"}
+# use the filter() function to extract the observations 
+```
+
+```{r filter-solution}
+UNpop %>%
+  filter(year <= 1990)
+```
+
+```{r filter-check}
+grade_this_code()
+```
+
+
+## Submit
+
+```{r context="setup"}
+submission_ui
+```
+
+```{r context="server"}
+submission_server()
+```

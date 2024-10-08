@@ -26,6 +26,7 @@ tutorial_options(exercise.checker = gradethis::grade_learnr)
 knitr::opts_chunk$set(echo = FALSE)
 tut_reptitle <- "Output Report"
 gapminder <- filter(gapminder, year == 2007)
+data(UNpop, package = "qss")
 ```
 
 ## Basics of R

@@ -1,0 +1,591 @@
+---
+title: "上海交通大学《数据科学导论》季程远：因果关系2"
+tutorial:
+  id: "03-r-causality-II"
+output:
+  learnr::tutorial:
+    progressive: true
+    ace_theme: github
+    css: "css/tutorial.css"
+runtime: shiny_prerendered
+description: >
+  This tutorial will cover logicals, subsetting, factors, and
+  calculating means in experiments. Companion to Chapter 2 of
+  "Quantitative Social Science: An Introduction in the Tidyverse".
+---
+
+<!-- Add JavaScript code for making the exercise code larger -->
+
+```{=html}
+<script language="JavaScript" src="js/exercise-font-size.js"></script>
+```
+```{r setup, include=FALSE}
+library(gradethis)
+library(learnr)
+library(qsslearnr)
+library(gapminder)
+library(tidyverse)
+library(nycflights13)
+tutorial_options(exercise.checker = gradethis::grade_learnr)
+knitr::opts_chunk$set(echo = TRUE)
+tut_reptitle <- "Output Report"
+data(resume, package = "qss")
+data(flights, package = "nycflights13")
+flights <- flights %>% filter(month == 6)
+
+```
+
+## Conceptual Questions
+
+
+```{r rct, echo=FALSE}
+question('Which of the following approaches to identifying causal relationships is considered the "gold standard" in many scientific disciplines?',
+              answer("Randomized controlled trials"),
+              answer("Randomized experiments"),
+              answer("Either of these", correct = TRUE)
+         )
+```
+
+For ethical and logistical reasons, social scientists are often unable to conduct randomized controlled trials (RCTs). Therefore, they must conduct observational studies in which data on naturally occurring events are collected and analyzed.
+
+```{r validity, echo = FALSE}
+question("With observational studies, it is often hard to establish that changes in one variable caused changes in another variable. In other words, observational studies have less __________ compared to RCTS.",
+         answer("Internal validity", correct = TRUE),
+         answer("External validity"),
+         answer("Generalizability"),
+         answer("All of these"))
+```
+
+## More Logicals in R
+
+### Complex relationals
+
+
+In this exercise, you have the ages of a sample of 15 people, stored in the `ages` vector. We can use these relational operators to create a logical vector which indicates which ages fall within a specific range. In particular, we can find out which respondents are college-aged (18-22).
+
+#### Exercise
+
+- Create a logical vector, called `college.aged`, which indicates which observations in `ages` are greater than or equal to 18 and less than or equal to 22. Be sure to use parentheses to separate out the two logical statements.
+- Take the sum of the `college.aged` vector to determine how many people around 18-22 year old there are in the sample.
+
+```{r generate-ages}
+## check the value of the ages vector
+ages <- c(31, 20, 43, 45, 41, 46, 28, 49, 61, 19, 39)
+```
+
+
+```{r ages, exercise = TRUE}
+## check the value of the ages vector
+ages <- c(31, 20, 43, 45, 41, 46, 28, 49, 61, 19, 39)
+## create a logical vector called college.aged
+## that is TRUE for someone between 18-22, inclusive
+## find the number of college.aged respondents
+```
+
+```{r ages-solution}
+college.aged <- (ages >= 18) & (ages <= 22)
+sum(college.aged)
+```
+
+```{r ages-check}
+grade_result_strict(
+  pass_if(~ identical(college.aged, (ages >= 18) & (ages <= 22))),
+  pass_if(~ identical(.result, sum((ages >= 18) & (ages <= 22))))
+)
+```
+
+
+### Subsetting based on logicals
+
+
+
+In the last exercise, you used logical statements to create a vector that told us whether each entry in the `ages` vector is in the 18-22 year-old range. We can now use that information to figure out what the actual ages of the respondents in that range are. 
+
+In base R, you can use the brackets for subsetting the data, and apply functions (such as `mean` to calculate the average) to this subset. For more details, please refer to the base R version of this tutorial.
+
+However, tidyverse functions for subsetting the data, such as `filter()` or `select()` cannot be applied to vectors. In this sense, if you would like to subset vectors, base R works better than tidyverse.
+
+Another useful tool for subsetting is the `mutate` function. `mutate` function allows you to create a new column in the original data frame. For example, if you want to add to a column to `mydata`, you should put the original data frame as the first argument, and the second argument would be the formula for creating a new variable.
+
+#### Exercise
+
+- Using the `UNpop` data set from the first tutorial, let's create a new data frame withe a new column `world.pop.mill` by dividing the `world.pop` by 1000.
+
+```{r unpop}
+UNpop <- data.frame(
+  year = seq(1950, 2010, by = 10),
+  world.pop = c(2525779, 3026003, 3691173, 4449049, 5320817, 6127700, 6916183)
+)
+```
+
+```{r mutate, exercise = TRUE, exercise.setup = "unpop"}
+UNpop.mill <- UNpop %>%
+  
+```
+
+```{r mutate-solution}
+UNpop.mill <- UNpop %>%
+  mutate(world.pop.mill = world.pop / 1000)
+```
+
+```{r mutate-check}
+grade_code()
+```
+
+### Using simple conditional statements
+
+For this exercise, we'll use the resume data once again.
+
+What if we wanted to create a new vector that depends on whether a statement is true or false? For example, suppose you wanted to create an indicator variable for whether or not a specific resume had the name "Carrie." We can  create a new variable using the `if_else(X, Y, Z)` command. This command takes a logical vector as `X` and returns a new vector of the same length as `X` that has the value `Y` if that value in `X` is TRUE and `Z` if that value in `X` is FALSE.
+
+
+#### Exercise
+
+- Use the `if_else` and `mutate` functions to create a new variable called `carrie` that is 1 if the resume name (`firstname`) is `"Carrie"` and 0 otherwise.
+- Print the first six lines of `resume` using the `head` function to see the new variable.
+
+```{r ifelse, exercise = TRUE}
+## create a new variable called carrie
+## print the first 6 lines of the updated resume
+resume <- resume %>%
+  mutate(carrie = )
+
+```
+
+```{r ifelse-hint}
+## create a new variable called carrie
+## print the first 6 lines of the updated resume
+resume <- resume %>%
+  mutate(carrie = if_else(???, ???, ???))
+???()
+```
+
+
+```{r ifelse-solution}
+## create a new variable called carrie
+## print the first 6 lines of the updated resume
+resume <- resume %>%
+  mutate(carrie = if_else(firstname == "Carrie", 1, 0)) 
+
+head(resume)
+```
+
+```{r ifelse-check}
+grade_this_code()
+```
+
+## Factors variables in R
+
+### Factor variables
+
+
+You have seen that creating subsets can be helpful for calculating different quantities or statistics for specific subgroups in the data. When there is more than 1 or 2 subgroups of interest, however, this can be a cumbersome process. For that reason, it's helpful to know about factor variables. Basically, a factor variable is a categorical variable that takes a finite number of distinct values.
+
+Any variable can be turned into a factor by calling the `as.factor()` function like so:
+
+    mydata$myvar <- as.factor(mydata$myvar)
+
+This will take the variable `myvar` and create a factor variable with levels that are observed in that variable. Most often, you will convert a character variable to a factor.
+
+#### Exercise
+
+- Finish the code below that creates the `type` character variable. Fill in the last values of `race` and `sex` and add the label `WhiteMale` to this last type.
+- Convert the `type` variable to a factor variable using `mutate()` and `as.factor()`.
+
+```{r factor-setup}
+resume <-
+  resume %>%
+  mutate(carrie = if_else(firstname == "Carrie", 1, 0))
+```
+
+```{r factor, exercise = TRUE}
+## fill in the last line of code to create a character vector for the type of
+## application that was sent
+## turn the character vector into a factor
+resume <- resume %>%
+  mutate(type = if_else(race == "black" & sex == "female", "BlackFemale", ""),
+         type = if_else(race == "black" & sex == "male", "BlackMale", type),
+         type = if_else(race == "white" & sex == "female", "WhiteFemale", type),
+         type = if_else(race == ??? & sex == ???, ???, ???)) %>%
+  mutate()
+```
+
+```{r factor-hint}
+## fill in the last line of code to create a character vector for the type of
+## application that was sent
+## turn the character vector into a factor
+resume <- resume %>%
+  mutate(type = if_else(race == "black" & sex == "female", "BlackFemale", ""),
+         type = if_else(race == "black" & sex == "male", "BlackMale", type),
+         type = if_else(race == "white" & sex == "female", "WhiteFemale", type),
+         type = if_else(race == ??? & sex == ???, "WhiteMale", type)) %>%
+  mutate(type = ???(type))
+```
+
+```{r factor-solution}
+## fill in the last line of code to create a character vector for the type of
+## application that was sent
+## turn the character vector into a factor
+resume <- resume %>%
+  mutate(type = if_else(race == "black" & sex == "female", "BlackFemale", ""),
+         type = if_else(race == "black" & sex == "male", "BlackMale", type),
+         type = if_else(race == "white" & sex == "female", "WhiteFemale", type),
+         type = if_else(race == "white" & sex == "male", "WhiteMale", type)) %>%
+  mutate(type = as.factor(type))
+```
+
+```{r factor-check}
+grade_code("Fantastic, you got that factor loaded up and ready to go. Now, let's see what you can do with it.")
+```
+
+
+For creating factor variables, it is sometimes easier to use another useful command, `case_when()`. This function uses the tilde `~` operator, which assigns the value after the tilde to the new variable type. This is especially useful, when the conditions cannot cover every observation: in that case, you can add `TRUE ~ "other"` at the end so that the remaining observations will be assigned to the `other` value.
+
+```{r casewhen, exercise = TRUE}
+resume <- resume %>%
+  mutate(
+    
+  )
+```
+
+```{r casewhen-solution}
+resume <- resume %>%
+  mutate(type = case_when(race == "black" & sex == "female" ~ "BlackFemale",
+                          race == "white" & sex == "female" ~ "WhiteFemale",
+                          race == "black" & sex == "male" ~ "BlackMale",
+                          race == "white" & sex == "male" ~ "WhiteMale",
+                          TRUE ~ "other"
+  ))
+```
+
+```{r casewhen-check}
+grade_code()
+```
+
+### Using factors
+
+
+With the tidyverse, we do not often need to use factor variables. Instead, we can use `group_by()` and other tidyverse functions that we mentioned before, to compute a function on subsets of the data.
+
+
+#### Exercise
+
+- Use the `count()` function on the `type` variable  in `resume` data frame to see how many fictitious applications were sent out with each type of name.
+
+```{r get-tapply}
+resume <- resume %>%
+  mutate(carrie = if_else(firstname == "Carrie", 1, 0)) %>%
+  mutate(type = if_else(race == "black" & sex == "female", "BlackFemale", ""),
+         type = if_else(race == "black" & sex == "male", "BlackMale", type),
+         type = if_else(race == "white" & sex == "female", "WhiteFemale", type),
+         type = if_else(race == "white" & sex == "male", "WhiteMale", type)) %>%
+  mutate(type = as.factor(type))
+```
+
+```{r table-type, exercise = TRUE, exercise.setup = "get-tapply"}
+## get the number of observations for each level of the type variable
+resume %>%
+  
+```
+
+```{r table-type-solution}
+resume %>%
+  count(type)
+```
+
+```{r table-type-check}
+grade_code()
+```
+
+- Use the `group_by()`, `select()`, and `summarize()` functions to calculate the `mean` of the `call` variable in each level of `race` and `sex` in the `resume` data frame.
+
+
+```{r tapply, exercise = TRUE, exercise.setup = "get-tapply"}
+## use the `group_by()`, `select()`, and `summarize()` functions to calculate the mean in each level of race and sex
+resume %>%
+  
+```
+
+```{r tapply-hint}
+## use the `group_by()`, `select()`, and `summarize()` functions to calculate the mean in each level of race and sex
+resume %>%
+  group_by(sex, race) %>%
+  select(???) %>%
+  summarize(callback = ???)
+```
+
+```{r tapply-solution}
+## use the `group_by()`, `select()`, and `summarize()` functions to calculate the mean in each level of race and sex
+resume %>%
+  group_by(sex, race) %>%
+  select(sex, race, call) %>%
+  summarize(callback = mean(call))
+```
+
+```{r tapply-check}
+grade_code("Great work, you have the skills you need to analyze experiments and observational data!")
+```
+
+## Nesting functions
+
+### The pipe operator `%>%`
+
+One important idea in R is *nesting function calls.* Basically, a common data wrangling pipeline takes the output of one function and passes it to the next function. We might even do this two or three or more times. 
+
+```{r}
+head(mtcars$wt)
+```
+
+```{r}
+summary(head(mtcars$wt))
+```
+
+```{r}
+names(summary(head(mtcars$wt)))
+```
+
+```{r}
+length(names(summary(head(mtcars$wt))))
+```
+
+
+Whew! This is getting a little ridiculous and it very hard to read because the order of operations works inside out (first you run `head()`, then `summary()`, and so on). 
+
+Luckily there is a better way to organize these calls, using the *pipe operator*:
+```{r}
+mtcars$wt %>%
+  head() %>%
+  summary() %>%
+  names() %>%
+  length()
+```
+
+You can think of `%>%` as saying "and then do". We often write it vertically like this to make it easier to read. By default, the pipe always passes output of the previous call to the **first argument** of the next function.  
+
+
+## Filtering rows
+
+In this tutorial, we'll look at a data set of flights departing New York City in June 2013. This is a fairly clean data set that will allow to practice our wrangling skills. 
+
+```{r}
+flights
+```
+
+
+### Exercises
+
+Use `filter` to display the subsets of the data with the following restrictions. 
+
+Find all flights that had an arrival delay of two hours or more (note that the delay variables in this data set are in minutes):
+
+```{r late-flights, exercise = TRUE}
+
+```
+
+```{r late-flights-solution}
+flights %>%
+  filter(arr_delay >= 120)
+```
+
+```{r late-flights-check}
+gradethis::grade_this_code()
+```
+
+Find all flights to Houston (`IAH` or `HOU`):
+
+```{r houston-flights, exercise = TRUE}
+
+```
+
+```{r houston-flights-solution}
+flights %>%
+  filter(dest == "IAH" | dest == "HOU")
+```
+
+```{r houston-flights-check}
+gradethis::grade_this_code()
+```
+
+### `%in%` operator
+
+If we have a long set of "or" operators on the same variable, we can use the `%in%` command to make things a bit simpler. The syntax `x %in% y` will select all the values of `x` that are in the vector `y`. For instance, the same filter for `LAX` or `SFO` can be written as:
+```{r}
+flights %>%
+  filter(dest %in% c("LAX", "SFO"))
+```
+
+
+Use the `%in%` command to find all flights that were operated by United ("UA"), American ("AA"), or Delta ("DL"):
+
+```{r carrier-flights, exercise = TRUE}
+
+```
+
+```{r carrier-flights-solution}
+flights %>%
+  filter(carrier %in% c("UA", "AA", "DL"))
+```
+
+```{r carrier-flights-check}
+gradethis::grade_this_code()
+```
+
+
+## Summarizing variables
+
+We often would like to get numerical summaries of the variables in our dataset. These might be means, medians, measures of spread, or other ways to summarize a collection of values. The `summarize()` function in `{dplyr}` consists of a number of name-value pairs where the value is some code that summarized a variable and the name is the label we want to give that summary in the resulting data frame.
+
+If we wanted to get the mean (via the `mean()` function) and standard deviation (via the `sd()` function, which is a measure of spread, it's not vital that we know exactly what it means right now) for the departure delay, we could do
+
+```{r}
+flights %>% summarize(delay_mean = mean(dep_delay),
+                     delay_sd = sd(dep_delay))
+```
+
+Hm... what are these `NA` values?
+
+### `NA` values
+
+`NA` is how R internally represents a missing value. R doesn't know how to do arithmetic on missing values, so any time a variable has a missing value, many summary functions of R will also return `NA`. In many of these functions, we can tell R to ignore the missing values by adding the argument `na.rm = TRUE` (which means "remove" the NAs):
+
+```{r}
+flights %>% summarize(dep_mean = mean(dep_delay, na.rm = TRUE),
+                     dep_sd = sd(dep_delay, na.rm = TRUE))
+```
+
+### Exercise
+
+
+Summarize the arrival delays mean and standard deviation calling the `arr_mean` and `arr_sd` labels. Be sure to avoid any issues with missing values. 
+
+```{r arr-summary, exercise = TRUE}
+flights %>%
+  summarize(arr_mean = ___,
+            arr_sd = ___)
+```
+
+```{r arr-summary-solution}
+flights %>% summarize(arr_mean = mean(arr_delay, na.rm = TRUE),
+                     arr_sd = sd(arr_delay, na.rm = TRUE))
+```
+
+```{r arr-summary-check}
+gradethis::grade_this_code()
+```
+
+
+## Grouping rows
+
+Using `summarize()` on the whole dataset isn't the most mind-blowing technique since we could also just use functions like `mean()` and `sd()` directly on the variables from the data. Where `summarize()` shines is in applying them separately to groups or subsets of the data defined by variables. To do summaries within groups, we first have to tell R on what variable to group the data and then the summaries we want. For example, let's say we wanted the average departure and arrival delays for each destination. Then we add a call to `group_by` to our pipe chain:
+
+```{r}
+flights %>%
+  group_by(dest) %>%
+  summarize(dep_mean = mean(dep_delay, na.rm = TRUE),
+            arr_mean = mean(arr_delay, na.rm = TRUE))
+```
+
+We get an output where each row is a unique destination (that is, a unique value of `dest`) and we get the means of interest applied to the flights within those values. One useful summary function here is `n()` which will return the number of observations within the group:
+
+```{r}
+flights %>%
+  group_by(dest) %>%
+  summarize(dep_mean = mean(dep_delay, na.rm = TRUE),
+            arr_mean = mean(arr_delay, na.rm = TRUE),
+            count = n())
+```
+
+
+### Exercise
+
+Return the average depart and arrival delay and the total number of flights for each airline. 
+
+```{r group-flights, exercise = TRUE}
+flights %>%
+  group_by(___) %>%
+  summarize(dep_mean = ___,
+            arr_mean = ___,
+            count = ___)
+```
+
+```{r group-flights-solution}
+flights %>%
+  group_by(carrier) %>%
+  summarize(dep_mean = mean(dep_delay, na.rm = TRUE),
+            arr_mean = mean(arr_delay, na.rm = TRUE),
+            count = n())
+```
+
+```{r group-flights-check}
+gradethis::grade_this_code()
+```
+
+
+You can also group by more than one variable. Try grouping by both carrier and destination and summarizing by `n()` to see how counts vary by both of those variables:
+
+```{r two-groups, exercise = TRUE}
+flights %>%
+  group_by(___, ___) %>%
+  summarize(count = ___)
+```
+
+```{r two-groups-solution}
+flights %>%
+  group_by(carrier, dest) %>%
+  summarize(count = n())
+```
+
+```{r two-groups-check}
+gradethis::grade_this_code()
+```
+
+
+
+## Mutating variables
+
+Sometimes the variables we need to create new variables that are transformation or mutations of existing variables. This is where the `mutate()` function comes in. 
+
+For instance, if we wanted to get the length of departure delay in hours, we could do the following:
+
+```{r}
+flights %>%
+  mutate(dep_delay_hr = dep_delay / 60) %>%
+  select(year, month, day, dep_delay, dep_delay_hr)
+```
+
+Here we've used the `select()` function to select the variables that we want to display. 
+
+
+### Exercises
+
+Use `mutate()` to create a `gain` variable that is the difference between the departure delay and the arrival delay. This is the amount of time that the plane made up on the journey. Then, summarize the average gain grouped by carrier. 
+
+
+```{r mutate-group, exercise = TRUE}
+flights %>%
+  mutate(gain = ___) %>%
+  group_by(___) %>%
+  summarize(avg_gain = ___)
+```
+
+```{r mutate-group-solution}
+flights %>%
+  mutate(gain = dep_delay - arr_delay) %>%
+  group_by(carrier) %>%
+  summarize(avg_gain = mean(gain, na.rm = TRUE))
+```
+
+```{r mutate-group-check}
+gradethis::grade_this_code()
+```
+
+
+## Submit
+
+```{r context="setup"}
+submission_ui
+```
+
+```{r context="server"}
+submission_server()
+```
